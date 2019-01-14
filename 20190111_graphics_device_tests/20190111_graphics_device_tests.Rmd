@@ -1,0 +1,156 @@
+---
+title: "Plots From Large Datasets"
+output: html_notebook
+---
+
+
+## Disclaimer
+Make a few experiments with plots with large datasets
+
+
+## Devices
+Different devices such as `png`, `jpeg` and others require `xorg-dev` library. 
+
+
+## Experiments
+
+We generate a reasonably sized dataset and try different potting options
+
+```{r}
+n_nr_obs <- 10^5
+n_inter <- 3.24
+n_slope <- 0.7
+x <- runif(n_nr_obs)
+y <- n_inter + n_slope * x + rnorm(n_nr_obs)
+```
+
+
+## Plots
+Normal inline plotting looks as follows
+
+```{r}
+plot(x,y)
+```
+
+## Plots to Files
+Different devices generate different file sizes. 
+
+```{r}
+s_file_stem <- "Rplot"
+s_file_dev <- "png"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+png(filename = s_out_path)
+plot(x,y)
+dev.off()
+```
+
+The generated file has the following properties
+
+```{r}
+(df_png_finfo <- file.info(s_out_path))
+```
+
+This file was generated as a benchmark for the filesize which is: `r df_png_finfo$size`
+
+## Different Devices
+
+### pdf
+
+```{r}
+s_file_stem <- "Rplot"
+s_file_dev <- "pdf"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+pdf(file = s_out_path)
+plot(x,y)
+dev.off()
+```
+
+The file size here is
+
+```{r}
+(df_pdf_finfo <- file.info(s_out_path))
+```
+
+
+
+### Postscript
+
+```{r}
+s_file_stem <- "Rplot"
+s_file_dev <- "ps"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+postscript(file = s_out_path)
+plot(x,y)
+dev.off()
+```
+
+The file size here is
+
+```{r}
+(df_pdf_finfo <- file.info(s_out_path))
+```
+
+
+## Available Options
+Because the filesize of `pdf()` was smaller, we first look at options for this device. Options can be listed by
+
+```{r}
+pdf.options()
+```
+
+* width and height
+
+```{r}
+s_file_stem <- "Rplothw14"
+s_file_dev <- "pdf"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+pdf(file = s_out_path, width = 14, height = 14)
+plot(x,y)
+dev.off()
+(df_pdf_finfo <- file.info(s_out_path))
+```
+
+Changing the height and width does not make the file size smaller
+
+```{r}
+s_file_stem <- "Rplotps2"
+s_file_dev <- "pdf"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+pdf(file = s_out_path, pointsize = 2)
+plot(x,y)
+dev.off()
+(df_pdf_finfo <- file.info(s_out_path))
+
+```
+
+```{r}
+s_file_stem <- "Rplotps24"
+s_file_dev <- "pdf"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+pdf(file = s_out_path, pointsize = 24)
+plot(x,y)
+dev.off()
+(df_pdf_finfo <- file.info(s_out_path))
+```
+
+```{r}
+s_file_stem <- "Rplotcmg"
+s_file_dev <- "pdf"
+s_out_path <- paste(s_file_stem, s_file_dev, sep = ".")
+pdf(file = s_out_path, colormodel = "grey")
+plot(x,y)
+dev.off()
+(df_pdf_finfo <- file.info(s_out_path))
+```
+
+
+## More tools
+
+### compactPDF
+The function `tools::compactPDF()` did not work
+
+
+### 
+From https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Murrell.pdf
+
+
