@@ -194,11 +194,6 @@ dev.off()
 file.info(s_out_path)["size"]
 ```
 
-```{r}
-?smoothScatter
-
-```
-
 
 
 ### ggsave

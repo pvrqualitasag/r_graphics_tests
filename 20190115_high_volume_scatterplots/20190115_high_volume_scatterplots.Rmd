@@ -1,0 +1,95 @@
+---
+title: "High-volume Scatterplots Revisited"
+author: "Peter von Rohr"
+date: "2019-01-15"
+output: html_notebook
+---
+
+
+## Introduction
+High-volume scatterplot are scatterplots with many points. This typically leads to overplotting and when saving the plots to files using vector-based devices such as `pdf()` or `postscript` result files are very large.
+
+A first solution to this problem is to use raster-based graphics devices such as `png()` or `jpeg()`. But those devices require X11-library support to be installed. On an ubuntu system this support can be installed using the package `xorg-dev`. 
+
+In what follows alternative ways to overcome the problem of high-volume scatterplots when the native raster-based devices such as `png()` and `jpeg()` are not available are described. 
+
+
+## Alternative Solutions
+This section contains a few alternative solutions
+
+
+### smoothScatter
+Instead of plotting each point in a high-volumn scatterplot, a smoothed version of the plot is drawn using a 2D kernel density estimate. This can be done in the function `graphics::smoothScatter()` which is available in base-r. This approach is described in more detail under https://www.stat.ubc.ca/~jenny/STAT545A/block91_latticeGraphics.html. 
+
+
+### grid.raster
+In case we are able to represent the scatterplot data in a matrix, we can use `grid.raster()` to draw a rasterized image of the plot. For more details, please have a look at https://www.stat.ubc.ca/~jenny/STAT545A/block91_latticeGraphics.html
+
+
+### gglot2
+Instead of saving the plots as raster-based images, we can use `ggplot2` for plottting and save the plot as R-objects using the `save()` function. The saved R-objects can be re-loaded on a different system with support for `png()` and `jpeg()` and viewed on this second system.
+
+
+## Numerical Example
+In this section we want to investigate the file sizes of the different proposed approaches. For this we first create a random dataset and create from this a scatterplot and save those plots to files.
+
+
+```{r}
+n_nr_obs <- 10^5
+n_inter <- 3.24
+n_slope <- 0.7
+x <- runif(n_nr_obs)
+y <- n_inter + n_slope * x + rnorm(n_nr_obs)
+tbl_plot_data <- tibble::tibble(x = x, y = y)
+```
+
+
+### pdf
+As a reference to the upper bound of the file size, we start by creating a vector-based version of the scatterplot and see that the file size is very large.
+
+```{r}
+s_out_path_vec <- "Rvecplot.pdf"
+pdf(s_out_path_vec)
+plot(x, y)
+dev.off()
+n_vec_filesize <- file.info(s_out_path_vec)$size
+```
+
+
+### png 
+The lower bound of the file size or the target value is reached with an ordinary `png`-plot
+
+```{r}
+s_out_path_png <- "Rpngplot.png"
+png(s_out_path_png)
+plot(x, y)
+dev.off()
+n_png_filesize <- file.info(s_out_path_png)$size
+```
+
+
+### smoothScatter
+The `graphics` package from r-base contains the function `smoothScatter()` which shades the plane according to a 2D kernel density estimate. 
+
+```{r}
+s_out_path_smooth <- "Rsmoothplot.pdf"
+pdf(s_out_path_smooth)
+#smoothScatter(y ~ x, colramp = colorRampPalette(c("white", blues9)), xlim = c(0,1), ylim = c(0, 8))
+smoothScatter(y ~ x, xlim = c(0,1), ylim = c(0, 8))
+dev.off()
+n_smooth_filesize <- file.info(s_out_path_smooth)$size
+```
+
+
+
+### Resulting Filesizes
+The table below gives an overview of the file sizes
+
+```{r, echo=FALSE, results='asis'}
+tbl_file_size <- tibble::tibble(Filename = c(s_out_path_vec, s_out_path_png, s_out_path_smooth),
+                                Method = c("pdf", "png", "smooth"),
+                                `File Size (in KB)`= round(c(n_vec_filesize, n_png_filesize, n_smooth_filesize)/1024, digits = 2))
+knitr::kable(tbl_file_size,
+             booktabs = TRUE)
+```
+
