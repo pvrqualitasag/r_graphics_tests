@@ -184,7 +184,7 @@ To use the `grid.raster()` function, we have to convert the scatter-plot into a 
 
 
 ### smoothscatter
-Avoiding effects of overplotting with a smoothed version of the scatterplot. 
+Avoiding effects of overplotting with a smoothed version of the scatterplot. See https://www.stat.ubc.ca/~jenny/STAT545A/block91_latticeGraphics.html for more details.
 
 ```{r}
 smoothScatter(y ~ x, asp = 1)
