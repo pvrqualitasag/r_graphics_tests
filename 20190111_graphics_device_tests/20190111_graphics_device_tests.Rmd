@@ -35,7 +35,7 @@ n_inter <- 3.24
 n_slope <- 0.7
 x <- runif(n_nr_obs)
 y <- n_inter + n_slope * x + rnorm(n_nr_obs)
-tbl_plot_data <- tibble::data_frame(x = x, y = y)
+tbl_plot_data <- tibble::tibble(x = x, y = y)
 ```
 
 
@@ -187,7 +187,11 @@ To use the `grid.raster()` function, we have to convert the scatter-plot into a 
 Avoiding effects of overplotting with a smoothed version of the scatterplot. 
 
 ```{r}
-smoothScatter(y ~ x, asp = 1)
+s_out_path <- "RsmoothScatter.pdf"
+pdf(s_out_path)
+smoothScatter(y ~ x, colramp = colorRampPalette(c("white", blues9)), xlim = c(0,1), ylim = c(0, 8))
+dev.off()
+file.info(s_out_path)["size"]
 ```
 
 ```{r}
