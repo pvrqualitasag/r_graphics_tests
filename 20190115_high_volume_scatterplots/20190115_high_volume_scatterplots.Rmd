@@ -23,7 +23,7 @@ Instead of plotting each point in a high-volumn scatterplot, a smoothed version 
 
 
 ### grid.raster
-In case we are able to represent the scatterplot data in a matrix, we can use `grid.raster()` to draw a rasterized image of the plot. For more details, please have a look at https://www.stat.ubc.ca/~jenny/STAT545A/block91_latticeGraphics.html
+In case we are able to represent the scatterplot data in a matrix, we can use `grid.raster()` to draw a rasterized image of the plot. For more details, please have a look at https://journal.r-project.org/archive/2011-1/RJournal_2011-1_Murrell.pdf
 
 
 ### gglot2
@@ -42,6 +42,19 @@ x <- runif(n_nr_obs)
 y <- n_inter + n_slope * x + rnorm(n_nr_obs)
 tbl_plot_data <- tibble::tibble(x = x, y = y)
 ```
+
+The produced scatter plots that will be saved in files all look more or less as follows
+
+```{r}
+plot(x, y)
+```
+
+The above shown scatter plot contains large sections of over-plotting. A smoothed scatter plot might give more information in all areas of the plot.
+
+```{r}
+smoothScatter(y ~ x, xlim = c(0,1), ylim = c(0, 8))
+```
+
 
 
 ### pdf
@@ -81,15 +94,45 @@ n_smooth_filesize <- file.info(s_out_path_smooth)$size
 ```
 
 
+### ggplot2
+This approach is different in the sense that it does not store the graphics files, but it stores the graphics objects. This can only be done with `ggplot2`.
+
+```{r}
+require(ggplot2)
+s_put_path_plot_obj <- "Rplotobj.rda"
+p <- ggplot(tbl_plot_data, aes(x, y)) + geom_point()
+save(p, file = s_put_path_plot_obj)
+n_ggplot_filesize <- file.info(s_put_path_plot_obj)$size
+```
+
+On a different machine the plot is loaded again and the plotted.
+
+```{r}
+s_out_path_ggplot <- "Rggplot.png"
+load(s_put_path_plot_obj)
+ggsave(s_out_path_ggplot, plot = p, width = 4, height = 4)
+n_png_ggplot_filesize <- file.info(s_out_path_ggplot)$size
+```
+
 
 ### Resulting Filesizes
 The table below gives an overview of the file sizes
 
 ```{r, echo=FALSE, results='asis'}
-tbl_file_size <- tibble::tibble(Filename = c(s_out_path_vec, s_out_path_png, s_out_path_smooth),
-                                Method = c("pdf", "png", "smooth"),
-                                `File Size (in KB)`= round(c(n_vec_filesize, n_png_filesize, n_smooth_filesize)/1024, digits = 2))
+tbl_file_size <- tibble::tibble(Filename = c(s_out_path_vec, s_out_path_png, s_out_path_smooth, s_put_path_plot_obj, s_out_path_ggplot),
+                                Method = c("pdf", "png", "smooth", "ggplot2obj", "ggsave"),
+                                `File Size (in KB)`= round(c(n_vec_filesize, n_png_filesize, n_smooth_filesize, n_ggplot_filesize, n_png_ggplot_filesize)/1024, digits = 2))
+### # put the tibble into a table
 knitr::kable(tbl_file_size,
              booktabs = TRUE)
+```
+
+
+
+## Clean Up
+All the plot files are removed. 
+
+```{r}
+file.remove(tbl_file_size$Filename)
 ```
 
