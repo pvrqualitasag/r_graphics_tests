@@ -180,7 +180,39 @@ file.info("image.pdf", "gridraster.pdf")["size"]
 ```
 
 
-To use the `grid.raster()` function, we have to convert the scatter-plot into a raster matrix. 
+To use the `grid.raster()` function, we have to convert the scatter-plot into a raster matrix. One possible way of doing this is via a 2D density estimate. Sources for this are available at https://www.r-bloggers.com/5-ways-to-do-2d-histograms-in-r/ or https://www.datacamp.com/community/tutorials/bivariate-heatmaps. For other useful plotting stuff, also consider http://dwoll.de/rexrepos/posts/diagDistributions.html. 
+
+For our example, we use the default call from https://www.r-bloggers.com/5-ways-to-do-2d-histograms-in-r/ which uses the function `MASS::kde2d()`. 
+
+```{r}
+### # start with color housekeeping
+# Color housekeeping
+library(RColorBrewer)
+rf <- colorRampPalette(rev(brewer.pal(11,'Spectral')))
+r <- rf(32)
+
+library(MASS)
+# use default call
+k <- kde2d(tbl_plot_data$x, tbl_plot_data$y, n = 200)
+### # default image
+s_image_plot <- "image_plot.pdf"
+pdf(s_image_plot)
+image(k, col = r)
+dev.off()
+file.info(s_image_plot)["size"]
+```
+
+Now we use `grid.raster()` instead of `image()`
+
+```{r, eval=FALSE}
+### # default image
+s_raster_plot <- "gridraster_plot.pdf"
+pdf(s_raster_plot)
+### # the following does not work, have to find a way how to convert k to raster
+grid.raster(k, interp=FALSE)
+dev.off()
+file.info(s_raster_plot)["size"]
+```
 
 
 ### smoothscatter
