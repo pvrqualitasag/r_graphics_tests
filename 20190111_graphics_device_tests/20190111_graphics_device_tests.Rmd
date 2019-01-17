@@ -3,6 +3,8 @@ title: "Plots From Large Datasets"
 output: html_notebook
 ---
 
+
+
 ```{r}
 ### # define vector of required packages
 vec_req_pkgs <- c("tibble", "ggplot2")
@@ -202,17 +204,20 @@ dev.off()
 file.info(s_image_plot)["size"]
 ```
 
-Now we use `grid.raster()` instead of `image()`
+Now we use `grid.raster()` on `k$z` instead of `image()`
 
-```{r, eval=FALSE}
+
+```{r, eval=TRUE}
 ### # default image
 s_raster_plot <- "gridraster_plot.pdf"
 pdf(s_raster_plot)
 ### # the following does not work, have to find a way how to convert k to raster
-grid.raster(k, interp=FALSE)
+grid.raster(k$z, interp=FALSE)
 dev.off()
 file.info(s_raster_plot)["size"]
 ```
+
+The above command does produce a raster image although we have to consider that it is very different from the ones produced with image. It looks rotated and very fuzzy and hence none of the outliers can be detected. 
 
 
 ### smoothscatter
